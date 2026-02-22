@@ -205,11 +205,11 @@ Live dashboard showing metrics extracted from **your actual PDFs**:
 
 ### 🔒 Privacy First
 
-✅ **100% Local Processing** — All data stays on your computer 
-✅ **No Cloud Services** — No data sent to external servers 
-✅ **No API Keys Required** — Ollama runs completely offline 
-✅ **Open Source** — Audit the code yourself 
-✅ **No Telemetry** — Zero tracking or analytics 
+✅ **100% Local Processing** — All data stays on your computer  
+✅ **No Cloud Services** — No data sent to external servers  
+✅ **No API Keys Required** — Ollama runs completely offline  
+✅ **Open Source** — Audit the code yourself  
+✅ **No Telemetry** — Zero tracking or analytics  
 
 ---
 
