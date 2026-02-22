@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MoneyMind Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    * {
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      min-height: 100vh;
+    }
+
+    .metric-card {
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.4);
+    }
+
+    .chart-container {
+      background: #1e293b;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .chart-container canvas {
+      max-height: 300px;
+    }
+
+    .activity-item {
+      background: #334155;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border-left: 4px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .activity-item:hover {
+      background: #475569;
+      border-left-color: #22c55e;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .badge-green {
+      background: rgba(34, 197, 94, 0.2);
+      color: #22c55e;
+    }
+
+    .badge-orange {
+      background: rgba(249, 115, 22, 0.2);
+      color: #f97316;
+    }
+
+    .badge-blue {
+      background: rgba(59, 130, 246, 0.2);
+      color: #3b82f6;
+    }
+
+    .badge-purple {
+      background: rgba(168, 85, 247, 0.2);
+      color: #a855f7;
+    }
+
+    .pulse {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .7
+      }
+    }
+
+    #refreshBtn {
+      transition: all 0.2s;
+    }
+
+    #refreshBtn:hover {
+      transform: scale(1.05);
+    }
+
+    #refreshBtn.spinning svg {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      from {
+        transform: rotate(0deg)
+      }
+
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 16px 24px;
+      color: white;
+      font-size: 0.9rem;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast.success {
+      border-left: 4px solid #22c55e;
+    }
+
+    .toast.error {
+      border-left: 4px solid #ef4444;
+    }
+  </style>
+</head>
+
+<body class="text-gray-100">
+
+  <div id="toast" class="toast"></div>
+
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 shadow-2xl">
+    <div class="container mx-auto px-6 py-8 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <div
+          class="w-12 h-12 bg-gradient-to-br from-green-400 to-blue-500 rounded-xl flex items-center justify-center text-2xl">
+          💎</div>
+        <div>
+          <h1 class="text-4xl font-bold text-white">MoneyMind</h1>
+          <p class="text-blue-200 text-sm">Your AI Financial Analyst</p>
+        </div>
+      </div>
+      <div class="text-right flex flex-col items-end gap-2">
+        <div>
+          <p class="text-sm text-blue-300">Last Updated</p>
+          <p class="text-lg font-semibold text-white" id="lastUpdate">--</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="badge badge-green pulse">● Live</span>
+          <button id="refreshBtn" onclick="refreshData()"
+            class="flex items-center gap-2 bg-blue-700 hover:bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Error Banner -->
+  <div id="errorBanner" class="hidden container mx-auto px-6 mt-4">
+    <div class="bg-red-900 border border-red-700 rounded-xl px-6 py-4 flex items-center gap-3">
+      <span class="text-2xl">⚠️</span>
+      <div>
+        <p class="font-semibold text-red-300">Could not load dashboard data</p>
+        <p class="text-sm text-red-400" id="errorMsg"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Metrics -->
+  <section class="container mx-auto px-6 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="metricsCards">
+      <div class="metric-card animate-pulse">
+        <div class="h-4 bg-gray-600 rounded w-1/2 mb-4"></div>
+        <div class="h-10 bg-gray-700 rounded w-3/4 mb-2"></div>
+        <div class="h-3 bg-gray-600 rounded w-full"></div>
+      </div>
+      <div class="metric-card animate-pulse">
+        <div class="h-4 bg-gray-600 rounded w-1/2 mb-4"></div>
+        <div class="h-10 bg-gray-700 rounded w-3/4 mb-2"></div>
+        <div class="h-3 bg-gray-600 rounded w-full"></div>
+      </div>
+      <div class="metric-card animate-pulse">
+        <div class="h-4 bg-gray-600 rounded w-1/2 mb-4"></div>
+        <div class="h-10 bg-gray-700 rounded w-3/4 mb-2"></div>
+        <div class="h-3 bg-gray-600 rounded w-full"></div>
+      </div>
+      <div class="metric-card animate-pulse">
+        <div class="h-4 bg-gray-600 rounded w-1/2 mb-4"></div>
+        <div class="h-10 bg-gray-700 rounded w-3/4 mb-2"></div>
+        <div class="h-3 bg-gray-600 rounded w-full"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Charts -->
+  <section class="container mx-auto px-6 py-4">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="chart-container">
+        <h3 class="text-xl font-semibold mb-6 text-white flex items-center gap-2"><span
+            class="text-2xl">📊</span>Spending by Category</h3>
+        <canvas id="categoryChart" height="300"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3 class="text-xl font-semibold mb-6 text-white flex items-center gap-2"><span class="text-2xl">📈</span>Net
+          Worth Trend</h3>
+        <canvas id="netWorthChart" height="300"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- Insights & Activity -->
+  <section class="container mx-auto px-6 py-4 pb-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="chart-container">
+        <h3 class="text-xl font-semibold mb-6 text-white flex items-center gap-2"><span class="text-2xl">💡</span>Key
+          Insights</h3>
+        <div id="keyInsights" class="space-y-4"></div>
+      </div>
+      <div class="chart-container">
+        <h3 class="text-xl font-semibold mb-6 text-white flex items-center gap-2"><span class="text-2xl">⚡</span>Recent
+          Activity</h3>
+        <div id="recentActivity" class="space-y-3"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="container mx-auto px-6 py-8 text-center">
+    <div class="inline-block bg-gray-800 rounded-lg px-6 py-4 border border-gray-700">
+      <p class="text-gray-400 text-sm">Generated by <span class="text-green-400 font-semibold">MoneyMind</span> • All
+        data processed locally • Your privacy guaranteed 🔒</p>
+    </div>
+  </footer>
+
+  <script>
+    // ── NO template literals with ${} for values — use helper functions instead
+    // This prevents any future accidental breakage when editing currency symbols
+
+    let categoryChartInstance = null;
+    let netWorthChartInstance = null;
+
+    // Format number as Indian Rupees: Rs.1,23,456
+    function inr(val) {
+      if (!val && val !== 0) return 'Rs.0';
+      return 'Rs.' + Number(val).toLocaleString('en-IN');
+    }
+
+    function showToast(msg, type) {
+      var t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show ' + (type || 'success');
+      setTimeout(function () { t.className = 'toast'; }, 3000);
+    }
+
+    async function fetchJSON(path) {
+      var res = await fetch(path, { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + res.statusText);
+      return res.json();
+    }
+
+    // ── Metrics cards ──────────────────────────────────────────────────────────
+    function renderMetrics(metrics) {
+      var m = metrics || {};
+      var subs = m.subscriptions || {};
+
+      var cards = [
+        {
+          title: 'Net Worth',
+          value: inr(m.net_worth || 0),
+          color: 'green',
+          subtitle: (m.organized_documents || 0) + ' docs organized',
+          badge: '↑ Growing'
+        },
+        {
+          title: 'Monthly Spending',
+          value: inr(m.monthly_spending || 0),
+          color: 'orange',
+          subtitle: 'Savings rate: ' + (m.savings_rate || 0) + '%',
+          badge: (m.savings_rate || 0) + '% saved'
+        },
+        {
+          title: 'Time Saved',
+          value: (m.time_saved_hours || 0) + 'h',
+          color: 'blue',
+          subtitle: 'Through automation',
+          badge: 'AI Powered'
+        },
+        {
+          title: 'Subscriptions',
+          value: inr(subs.monthly_cost || 0) + '/mo',
+          color: 'purple',
+          subtitle: inr(subs.savings_found || 0) + '/mo savings found 💡',
+          badge: (subs.active || 0) + ' active'
+        }
+      ];
+
+      var html = '';
+      for (var i = 0; i < cards.length; i++) {
+        var c = cards[i];
+        html += '<div class="metric-card border-l-4 border-' + c.color + '-500">';
+        html += '<div class="flex justify-between items-start mb-3">';
+        html += '<h3 class="text-gray-400 text-sm font-medium uppercase tracking-wide">' + c.title + '</h3>';
+        html += '<span class="badge badge-' + c.color + '">' + c.badge + '</span>';
+        html += '</div>';
+        html += '<p class="text-4xl font-bold text-' + c.color + '-400 mb-2">' + c.value + '</p>';
+        html += '<p class="text-xs text-gray-500">' + c.subtitle + '</p>';
+        html += '</div>';
+      }
+      document.getElementById('metricsCards').innerHTML = html;
+    }
+
+    // ── Insights ───────────────────────────────────────────────────────────────
+    function renderInsights(insights) {
+      var container = document.getElementById('keyInsights');
+      if (!insights || insights.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-sm">No insights yet — run MoneyMind workflows first.</p>';
+        return;
+      }
+      var html = '';
+      for (var i = 0; i < insights.length; i++) {
+        html += '<div class="activity-item flex items-start gap-3">';
+        html += '<span class="text-2xl">💡</span>';
+        html += '<p class="font-medium text-green-300 text-sm leading-relaxed">' + insights[i] + '</p>';
+        html += '</div>';
+      }
+      container.innerHTML = html;
+    }
+
+    // ── Activity ───────────────────────────────────────────────────────────────
+    function renderActivity(activities) {
+      var container = document.getElementById('recentActivity');
+      if (!activities || activities.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-sm">No activity yet — run MoneyMind workflows.</p>';
+        return;
+      }
+      var colorMap = { green: 'green', blue: 'blue', orange: 'orange', purple: 'purple' };
+      var html = '';
+      for (var i = 0; i < activities.length; i++) {
+        var act = activities[i];
+        var c = colorMap[act.color] || 'green';
+        html += '<div class="activity-item">';
+        html += '<div class="flex justify-between items-center">';
+        html += '<div>';
+        html += '<p class="font-semibold text-white text-sm">' + act.title + '</p>';
+        html += '<p class="text-xs text-gray-400 mt-1">' + act.time + '</p>';
+        html += '</div>';
+        html += '<span class="badge badge-' + c + ' ml-3 whitespace-nowrap">' + act.badge + '</span>';
+        html += '</div></div>';
+      }
+      container.innerHTML = html;
+    }
+
+    // ── Charts ─────────────────────────────────────────────────────────────────
+    function renderCharts(charts) {
+      var spending = (charts && charts.spending) || { labels: [], data: [] };
+      var netWorth = (charts && charts.net_worth) || { labels: [], data: [] };
+
+      if (categoryChartInstance) categoryChartInstance.destroy();
+      if (netWorthChartInstance) netWorthChartInstance.destroy();
+
+      // Only draw charts if there is real data
+      if (spending.data && spending.data.length > 0 && spending.data.some(function (v) { return v > 0; })) {
+        categoryChartInstance = new Chart(
+          document.getElementById('categoryChart').getContext('2d'), {
+          type: 'doughnut',
+          data: {
+            labels: spending.labels,
+            datasets: [{
+              data: spending.data,
+              backgroundColor: ['#ef4444', '#22c55e', '#3b82f6', '#a855f7', '#f59e0b', '#6b7280'],
+              borderWidth: 2,
+              borderColor: '#1e293b'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom', labels: { color: '#e5e7eb', padding: 16, font: { size: 12 } } },
+              tooltip: {
+                callbacks: {
+                  label: function (ctx) {
+                    var total = spending.data.reduce(function (a, b) { return a + b; }, 0);
+                    return ' ' + inr(ctx.parsed) + ' (' + Math.round(ctx.parsed / total * 100) + '%)';
+                  }
+                }
+              }
+            }
+          }
+        }
+        );
+      } else {
+        document.getElementById('categoryChart').parentElement.innerHTML +=
+          '<p class="text-gray-500 text-sm text-center mt-4">No spending data yet — organize your PDFs first.</p>';
+      }
+
+      if (netWorth.data && netWorth.data.length > 0 && netWorth.data.some(function (v) { return v > 0; })) {
+        netWorthChartInstance = new Chart(
+          document.getElementById('netWorthChart').getContext('2d'), {
+          type: 'line',
+          data: {
+            labels: netWorth.labels,
+            datasets: [{
+              label: 'Net Worth',
+              data: netWorth.data,
+              borderColor: '#22c55e',
+              backgroundColor: 'rgba(34,197,94,0.1)',
+              fill: true,
+              tension: 0.4,
+              pointRadius: 6,
+              pointHoverRadius: 8,
+              pointBackgroundColor: '#22c55e'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: {
+                ticks: {
+                  color: '#9ca3af',
+                  callback: function (v) { return 'Rs.' + (v / 1000).toFixed(0) + 'K'; }
+                },
+                grid: { color: 'rgba(255,255,255,0.07)' }
+              },
+              x: { ticks: { color: '#9ca3af' }, grid: { display: false } }
+            }
+          }
+        }
+        );
+      } else {
+        document.getElementById('netWorthChart').parentElement.innerHTML +=
+          '<p class="text-gray-500 text-sm text-center mt-4">No net worth data yet — organize bank statements first.</p>';
+      }
+    }
+
+    // ── Main ───────────────────────────────────────────────────────────────────
+    async function renderDashboard() {
+      document.getElementById('errorBanner').classList.add('hidden');
+      try {
+        var data = await fetchJSON('/dashboard_data.json');
+
+        document.getElementById('lastUpdate').textContent =
+          data.last_updated
+            ? new Date(data.last_updated).toLocaleString('en-IN')
+            : new Date().toLocaleString('en-IN');
+
+        renderMetrics(data.metrics);
+        renderInsights(data.insights);
+        renderActivity(data.recent_activity);
+        renderCharts(data.charts);
+
+      } catch (err) {
+        console.error('Dashboard error:', err);
+        document.getElementById('errorBanner').classList.remove('hidden');
+        document.getElementById('errorMsg').textContent =
+          'Make sure server is running: python server.py — then open http://localhost:8000';
+      }
+    }
+
+    async function refreshData() {
+      var btn = document.getElementById('refreshBtn');
+      btn.classList.add('spinning');
+      btn.disabled = true;
+      try {
+        var res = await fetch('/refresh', { method: 'POST' });
+        var result = await res.json();
+        if (result.status === 'ok') {
+          await renderDashboard();
+          showToast('✅ Dashboard refreshed!', 'success');
+        } else {
+          showToast('⚠️ Refresh failed: ' + (result.detail || 'unknown'), 'error');
+        }
+      } catch (e) {
+        await renderDashboard();
+        showToast('🔄 Data reloaded', 'success');
+      } finally {
+        btn.classList.remove('spinning');
+        btn.disabled = false;
+      }
+    }
+
+    renderDashboard();
+    setInterval(renderDashboard, 5 * 60 * 1000);
+  </script>
+</body>
+
+</html>
