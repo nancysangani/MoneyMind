@@ -9,7 +9,7 @@ An AI-powered financial automation system that transforms 6 hours of monthly fin
 [![Ollama](https://img.shields.io/badge/AI-Ollama-green.svg)](https://ollama.com)
 [![Accomplish](https://img.shields.io/badge/Automation-Accomplish-purple.svg)](https://accomplish.ai)
 
-[Demo Video](#-demo-video) • [Quick Start](#-quick-start) • [Features](#-features) • [How It Works](#-how-it-works)
+[Quick Start](#-quick-start) • [Features](#-features)
 
 ---
 
@@ -25,8 +25,8 @@ As a software engineer, I automate infrastructure for a living. Yet somehow, I w
 - 📈 **Creating monthly financial reports** in spreadsheets
 
 **The Breaking Point:**
-- **January 2025:** Paid Rs.2,500 late fee on forgotten credit card payment
-- **February 2025:** Discovered I'd been paying for unused gym membership for 8 months (Rs.7,992 wasted)
+- **January 2026:** Paid Rs.2,500 late fee on forgotten credit card payment
+- **February 2026:** Discovered I'd been paying for unused gym membership for 8 months (Rs.7,992 wasted)
 
 That's when I decided: **If I can automate CI/CD pipelines, I can automate my financial life.**
 
@@ -205,11 +205,11 @@ Live dashboard showing metrics extracted from **your actual PDFs**:
 
 ### 🔒 Privacy First
 
-✅ **100% Local Processing** — All data stays on your computer
-✅ **No Cloud Services** — No data sent to external servers
-✅ **No API Keys Required** — Ollama runs completely offline
-✅ **Open Source** — Audit the code yourself
-✅ **No Telemetry** — Zero tracking or analytics
+✅ **100% Local Processing** — All data stays on your computer 
+✅ **No Cloud Services** — No data sent to external servers 
+✅ **No API Keys Required** — Ollama runs completely offline 
+✅ **Open Source** — Audit the code yourself 
+✅ **No Telemetry** — Zero tracking or analytics 
 
 ---
 
@@ -219,13 +219,13 @@ Live dashboard showing metrics extracted from **your actual PDFs**:
 
 ```
 ┌─────────────────────────────────────────┐
-│         Accomplish Desktop Agent         │
-│   Natural language → workflow planning   │
+│         Accomplish Desktop Agent        │
+│   Natural language → workflow planning  │
 └─────────────────┬───────────────────────┘
                   │ triggers
 ┌─────────────────▼───────────────────────┐
-│         MoneyMind CLI (Python)           │
-│   Local Financial Automation Backend     │
+│         MoneyMind CLI (Python)          │
+│   Local Financial Automation Backend    │
 └─────────────┬───────────────┬───────────┘
               │               │
     ┌─────────▼────┐  ┌───────▼──────┐
@@ -242,9 +242,9 @@ Live dashboard showing metrics extracted from **your actual PDFs**:
            ┌────────────────────┐
            │  Live Dashboard    │
            │  localhost:8000    │
-           │                   │
+           │                    │
            │  Real Rs. amounts  │
-           │  from your PDFs   │
+           │  from your PDFs    │
            └────────────────────┘
 ```
 
@@ -276,11 +276,11 @@ Live dashboard showing metrics extracted from **your actual PDFs**:
 ### CLI Commands (Direct)
 
 ```bash
-python moneymind.py organize    # Scan Downloads → AI sort → metrics → dashboard JSON
-python moneymind.py metrics     # Re-parse PDFs → update CSVs
-python moneymind.py audit       # AI subscription audit → find savings
-python moneymind.py insights    # AI insights from real metrics
-python moneymind.py dashboard   # Build dashboard HTML + JSON
+python3 moneymind.py organize    # Scan Downloads → AI sort → metrics → dashboard JSON
+python3 moneymind.py metrics     # Re-parse PDFs → update CSVs
+python3 moneymind.py audit       # AI subscription audit → find savings
+python3 moneymind.py insights    # AI insights from real metrics
+python3 moneymind.py dashboard   # Build dashboard HTML + JSON
 python server.py                # Start server → http://localhost:8000
 ```
 
@@ -296,8 +296,8 @@ python server.py                # Start server → http://localhost:8000
 
 #### Monthly Review
 ```bash
-python moneymind.py organize   # Organize new documents
-python moneymind.py audit      # Check subscription changes
+python3 moneymind.py organize   # Organize new documents
+python3 moneymind.py audit      # Check subscription changes
 python server.py               # Review dashboard in Rs.
 ```
 
@@ -327,21 +327,6 @@ Money Saved:
 Combined Annual Value: Rs.2,05,500/year
 ROI: ∞ (free tool, infinite returns)
 ```
-
----
-
-## 🎬 Demo Video
-
-**Watch MoneyMind in action (3 minutes):**
-
-[![MoneyMind Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefault.jpg)](https://youtube.com/watch?v=YOUR_VIDEO_ID)
-
-**What you'll see:**
-- 0:00 — Messy Downloads with unorganized PDFs
-- 0:30 — Accomplish receiving natural language command
-- 1:00 — MoneyMind organizing files in real-time
-- 1:30 — Dashboard showing real Rs. amounts from actual PDFs
-- 2:30 — Before vs after transformation
 
 ---
 
@@ -403,7 +388,6 @@ MIT License — Use it freely, modify it, contribute back!
 
 ## 🔗 Links
 
-- **Demo Video:** [YouTube](#)
 - **Twitter:** [@nancys0929](https://x.com/nancys0929)
 - **LinkedIn:** [Nancy Sangani](https://www.linkedin.com/in/nancy-sangani-a2938132b)
 - **Email:** nancysangani299@gmail.com
