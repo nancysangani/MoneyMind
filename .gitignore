@@ -1,0 +1,54 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Logs
+*.log
+
+# Personal financial data (NEVER commit real financial documents)
+**/Finances/**/*.pdf
+**/Finances/**/*.csv
+**/Finances/**/statements/
+**/Finances/**/receipts/
+*.financial
+
+# Backup files
+*.bak
+*.backup
+*.zip.bak
+
+# Metrics with personal data
+metrics/*_personal.csv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# System
+.cache/
+.tmp/
+
+# Keep structure
+!.gitkeep
